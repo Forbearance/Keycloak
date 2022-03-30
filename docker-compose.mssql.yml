@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    ports:
+      - 1433:1433
+    volumes:
+      - ./mssql/data:/var/opt/mssql/data
+      - ./mssql/log:/var/opt/mssql/log
+      - ./mssql/secrets:/var/opt/mssql/secrets
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Pass@word1
+    keycloak:
+      image: quay.io/keycloak/keycloak:legacy
+      depends_on:
+        - mssql
+      ports:
+        - "8080:8080"
+      environment:
+        - KEYCLOAK_USER=admin
+        - KEYCLOAK_PASSWORD=admin
+        - DB_VENDOR=mssql
+        - DB_USER=keycloak_admin
+        - DB_PASSWORD=Pass@word1
+        - DB_ADDR=mssql
+        - DB_DATABASE=Keycloak
